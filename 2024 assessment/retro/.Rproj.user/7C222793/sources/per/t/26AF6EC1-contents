@@ -1,0 +1,331 @@
+#  function with predictions from 3 models 
+
+AgeFits3 <- function(dat,dat2,dat3,name1,name2,name3, main="",case_label="2014 assessment") {
+   subtle.color <- "gray40"
+   attach(dat2)
+   tmp1_2 <- paste("eac.f.unbiased",sep="")
+   pred2.data = get(tmp1_2) #[,1]
+   detach(dat2)
+   attach(dat3)
+   tmp1_3 <- paste("eac.f.unbiased",sep="")
+   pred3.data = get(tmp1_3) #[,1]
+   detach(dat3)
+   attach(dat)
+   tmp1 <- paste("eac.f.unbiased",sep="")
+   tmp2 <- paste("oac.f.unbiased",sep="")
+   tmp3 <- paste("oac.f.unbiased",sep="")
+   ages     = as.numeric(colnames(get(tmp3)))
+   ages.list <- ages
+   pred.data = get(tmp1) #[,1]
+   obs.data  = get(tmp2) #[,1]
+   years     = as.numeric(rownames(get(tmp3)))
+
+   nyears <- length(years)
+   nages <- length(ages.list)
+   mfcol <- c(ceiling(nyears),1)
+   par(mfcol=mfcol,oma=c(4.5,5.5,4.5,1),mar=c(0,0,0,0))
+   cohort.color <- rainbow(nages+2) #use hideous rainbow colors because they loop more gracefully than rich.colors     
+   ncolors <- length(cohort.color)
+   ylim <- c(0,1.05*max(obs.data,pred.data,pred2.data,pred3.data))
+   for (yr in 1:nyears) {
+     rowpred=years[yr]-1977+1
+     names.arg <- rep("",nages)
+     
+     
+     if (yr>1) 
+      {   
+      diff <- years[yr] - years[yr-1] 
+      cohort.color <- c(cohort.color[(ncolors-diff+1):ncolors],cohort.color[-1*((ncolors-diff+1):ncolors)])
+      }  
+     x <- barplot(obs.data[yr,],space=0.2,ylim=ylim,las=1,names.arg=names.arg, cex.names=0.5, xaxs="i",
+                 yaxs="i",border=subtle.color,
+                 col=cohort.color[1:nages],axes=F,ylab="",xlab="",main=main)
+
+      
+      if (yr %% mfcol[1] == 0) {
+         axis(side=1,at=x,lab=ages.list, line=-0.1,col.axis=subtle.color, col=subtle.color,lwd=0,lwd.ticks=0)  #just use for the labels, to allow more control than names.arg
+      }
+      if (yr <= mfcol[1]) {
+        axis(2,las=1,at=c(0,0.25,0.5),col=subtle.color,col.axis=subtle.color,lwd=0.5)
+      }
+      par(new=T)
+      par(xpd=NA)
+      plot(x=x,y=pred.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+          bg="white",fg="brown",
+          pch=19,cex=1.2,axes=F,ylab="",xlab="")
+      points(x=x,y=pred2.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+           bg="white",fg="brown",
+           pch=1,cex=1.2,axes=F,ylab="",xlab="")
+      points(x=x,y=pred3.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+             bg="white",fg="brown",
+             pch=2,cex=1.2,axes=F,ylab="",xlab="")
+      
+      
+      box(col=subtle.color,lwd=0.5)
+      x.pos <- par("usr")[1] + 0.85*diff(par("usr")[1:2])   #par("usr") spits out the current coordinates of the plot window
+      y.pos <- par("usr")[3] + 0.75*diff(par("usr")[3:4])   #par("usr") spits out the current coordinates of the plot window
+      text(x=x.pos,y=y.pos,years[yr],cex=1.2, col=subtle.color)
+      par(xpd=T)
+      if(yr==1)
+      {
+         x.pos <- par("usr")[1] + 0.10*diff(par("usr")[1:2])   #par("usr") spits out the current coordinates of the plot window
+         y.pos <- par("usr")[3] + 0.90*diff(par("usr")[3:4])   #par("usr") spits out the current coordinates of the plot window
+         legend(x.pos,y.pos,c(name1,name2,name3),pch=c(19,1,2), cex=1.4, bty="n")
+      }
+   }
+   mtext(side=1,outer=T,"Age",line=2.2, cex=1.4)
+   mtext(side=2,outer=T,"Proportion",line=3.2, las=0, cex=1.4)
+   mtext(side=3,outer=T,line=1.6,paste(""                ,"Fishery age composition data"), cex=1.4)
+   #mtext(side=3,outer=T,line=0.2,paste("(",case_label,")",sep=""),cex=1.0)
+   detach(dat)
+}
+
+
+AgeFitsSrv3 <- function(dat,dat2,dat3,name1,name2,name3, main="",case_label="2014 assessment") {
+   subtle.color <- "gray40"
+   # ages <- c(1,length(x$pobs_fsh[1,-1]) ) #age range
+   attach(dat2)
+   tmp1_2 <- paste("eac.srv",sep="")
+   pred2.data = get(tmp1_2) #[,1]
+   detach(dat2)
+   attach(dat3)
+   tmp1_3 <- paste("eac.srv",sep="")
+   pred3.data = get(tmp1_3) #[,1]
+   detach(dat3)
+   
+   attach(dat)
+   tmp1 <- paste("eac.srv",sep="")
+   tmp2 <- paste("oac.srv",sep="")
+   tmp3 <- paste("oac.srv",sep="")
+   ages     = as.numeric(colnames(get(tmp3)))
+   ages.list <- ages
+   pred.data = get(tmp1) #[,1]
+   obs.data  = get(tmp2) #[,1]
+   years     = as.numeric(rownames(get(tmp3)))
+
+   nyears <- length(years)
+   nages <- length(ages.list)
+   mfcol <- c(ceiling(nyears),1)
+   par(mfcol=mfcol,oma=c(4.5,5.5,4.5,1),mar=c(0,0,0,0))
+   cohort.color <- rainbow(nages+2) #use hideous rainbow colors because they loop more gracefully than rich.colors     
+   ncolors <- length(cohort.color)
+   ylim <- c(0,1.05*max(obs.data,pred.data,pred2.data,pred3.data))
+   for (yr in 1:nyears) {
+     rowpred=years[yr]-1977+1
+     names.arg <- rep("",nages)
+   if (yr>1) 
+      {   
+      diff <- years[yr] - years[yr-1] 
+      cohort.color <- c(cohort.color[(ncolors-diff+1):ncolors],cohort.color[-1*((ncolors-diff+1):ncolors)])
+      }  
+   x <- barplot(obs.data[yr,],space=0.2,ylim=ylim,las=1,names.arg=names.arg, cex.names=0.5, xaxs="i",
+                 yaxs="i",border=subtle.color,
+                 col=cohort.color[1:nages],axes=F,ylab="",xlab="",main=main)
+
+      if (yr %% mfcol[1] == 0) {
+         axis(side=1,at=x,lab=ages.list, line=-0.1,col.axis=subtle.color, col=subtle.color,lwd=0,lwd.ticks=0)  #just use for the labels, to allow more control than names.arg
+      }
+      if (yr <= mfcol[1]) {
+        axis(2,las=1,at=c(0,0.25,0.5),col=subtle.color,col.axis=subtle.color,lwd=0.5)
+      }
+      par(new=T)
+      par(xpd=NA)
+      plot(x=x,y=pred.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+          bg="white",fg="brown",
+          pch=19,cex=1.2,axes=F,ylab="",xlab="")
+      points(x=x,y=pred2.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+           bg="white",fg="brown",
+           pch=1,cex=1.2,axes=F,ylab="",xlab="")
+      points(x=x,y=pred3.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+             bg="white",fg="brown",
+             pch=2,cex=1.2,axes=F,ylab="",xlab="")
+      
+      box(col=subtle.color,lwd=0.5)
+      x.pos <- par("usr")[1] + 0.85*diff(par("usr")[1:2])   #par("usr") spits out the current coordinates of the plot window
+      y.pos <- par("usr")[3] + 0.75*diff(par("usr")[3:4])   #par("usr") spits out the current coordinates of the plot window
+      text(x=x.pos,y=y.pos,years[yr],cex=1.2, col=subtle.color)
+      par(xpd=T)
+      if(yr==1)
+      {
+         x.pos <- par("usr")[1] + 0.10*diff(par("usr")[1:2])   #par("usr") spits out the current coordinates of the plot window
+         y.pos <- par("usr")[3] + 0.90*diff(par("usr")[3:4])   #par("usr") spits out the current coordinates of the plot window
+         legend(x.pos,y.pos,c(name1,name2,name3),pch=c(19,1,2), cex=1.4, bty="n")
+      }
+   }
+   mtext(side=1,outer=T,"Age",line=2.2, cex=1.4)
+   mtext(side=2,outer=T,"Proportion",line=3.2, las=0, cex=1.4)
+   mtext(side=3,outer=T,line=1.6,paste(""                ,"AI Survey age composition data"), cex=1.4)
+   #mtext(side=3,outer=T,line=0.2,paste("(",case_label,")",sep=""),cex=1.0)
+   detach(dat)
+}
+
+
+
+
+LenFitsSrv3 <- function(dat,dat2,dat3,name1,name2,name3,main="",case_label="2014 assessment") {
+   subtle.color <- "gray40"
+   # ages <- c(1,length(x$pobs_fsh[1,-1]) ) #age range
+   attach(dat2)
+   tmp1_2 <- paste("elc.srv",sep="")
+   pred2.data = get(tmp1_2) #[,1]
+   detach(dat2)
+   attach(dat3)
+   tmp1_3 <- paste("elc.srv",sep="")
+   pred3.data = get(tmp1_3) #[,1]
+   detach(dat3)
+   
+   attach(dat)
+   tmp1 <- paste("elc.srv",sep="")
+   tmp2 <- paste("olc.srv",sep="")
+   tmp3 <- paste("olc.srv",sep="")
+   ages     = as.numeric(colnames(get(tmp3)))
+   ages.list <- ages
+   pred.data = get(tmp1) #[,1]
+   obs.data  = get(tmp2) #[,1]
+   years     = as.numeric(rownames(get(tmp3)))
+
+   nyears <- length(years)
+   nages <- length(ages.list)
+   mfcol <- c(ceiling(nyears),1)
+   par(mfcol=mfcol,oma=c(4.5,5.5,4.5,1),mar=c(0,0,0,0))
+   #cohort.color <- rainbow(nages+2) #use hideous rainbow colors because they loop more gracefully than rich.colors     
+   #ncolors <- length(cohort.color)
+   ylim <- c(0,1.05*max(obs.data,pred.data,pred2.data,pred3.data))
+   for (yr in 1:nyears) {
+     rowpred=years[yr]-1977+1
+     names.arg <- rep("",nages)
+  #if (yr>1) 
+  #    {   
+  #    diff <- years[yr] - years[yr-1] 
+  #    cohort.color <- c(cohort.color[(ncolors-diff+1):ncolors],cohort.color[-1*((ncolors-diff+1):ncolors)])
+  #    }  
+ x <- barplot(obs.data[yr,],space=0.2,ylim=ylim,las=1,names.arg=names.arg, cex.names=0.5, xaxs="i",
+                 yaxs="i",border=subtle.color,
+                 col=subtle.color,axes=F,ylab="",xlab="",main=main)
+
+      if (yr == nyears) {
+         axis(side=1,at=x,lab=ages.list, line=-0.1,col.axis=subtle.color, col=subtle.color,lwd=0,lwd.ticks=0)  #just use for the labels, to allow more control than names.arg
+      }
+    box(col=subtle.color,lwd=0.5)
+    #  if (yr <= mfcol[1]) {
+    #    axis(2,las=1,at=c(0,0.25,0.5),col=subtle.color,col.axis=subtle.color,lwd=0.5)
+    #  }
+      par(new=T)
+      par(xpd=NA)
+      plot(x=x,y=pred.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+          bg="white",fg="brown",
+          pch=19,cex=0.8,axes=F,ylab="",xlab="", col="red")
+      points(x=x,y=pred2.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+           bg="white",fg="brown",
+           pch=1,cex=0.8,axes=F,ylab="",xlab="", col="green")
+      points(x=x,y=pred3.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+             bg="white",fg="brown",
+             pch=2,cex=0.8,axes=F,ylab="",xlab="", col="blue")
+      
+      
+      box(col=subtle.color,lwd=0.5)
+      x.pos <- par("usr")[1] + 0.85*diff(par("usr")[1:2])   #par("usr") spits out the current coordinates of the plot window
+      y.pos <- par("usr")[3] + 0.75*diff(par("usr")[3:4])   #par("usr") spits out the current coordinates of the plot window
+      text(x=x.pos,y=y.pos,years[yr],cex=1.2,col=subtle.color)
+      par(xpd=T)
+      if(yr==1)
+      {
+         x.pos <- par("usr")[1] + 0.10*diff(par("usr")[1:2])   #par("usr") spits out the current coordinates of the plot window
+         y.pos <- par("usr")[3] + 0.90*diff(par("usr")[3:4])   #par("usr") spits out the current coordinates of the plot window
+         legend(x.pos,y.pos,c(name1,name2,name3),pch=c(19,1,2),col=c("red","green","blue"), cex=1.4, bty="n")
+      }
+   }
+   mtext(side=1,outer=T,"Length (cm)",line=2.2, cex=1.4)
+   mtext(side=2,outer=T,"Proportion",line=3.2, cex=1.4, las=0)
+   mtext(side=3,outer=T,line=1.6,paste(""                ,"AI Survey length composition data"), cex=1.4)
+   #mtext(side=3,outer=T,line=0.2,paste("(",case_label,")",sep=""),cex=1.0)
+   detach(dat)
+}
+
+
+LenFits3 <- function(dat,dat2,dat3,name1,name2,name3, main="",case_label="2014 assessment") {
+   subtle.color <- "gray40"
+   # ages <- c(1,length(x$pobs_fsh[1,-1]) ) #age range
+   attach(dat2)
+   tmp1_2 <- paste("elc.fish",sep="")
+   pred2.data = get(tmp1_2) #[,1]
+   detach(dat2)
+   attach(dat3)
+   tmp1_3 <- paste("elc.fish",sep="")
+   pred3.data = get(tmp1_3) #[,1]
+   detach(dat3)
+   
+   attach(dat)
+   tmp1 <- paste("elc.fish",sep="")
+   tmp2 <- paste("olc.fish",sep="")
+   tmp3 <- paste("olc.fish",sep="")
+   ages     = as.numeric(colnames(get(tmp3)))
+   ages.list <- ages
+   pred.data = get(tmp1) #[,1]
+   obs.data  = get(tmp2) #[,1]
+   years     = as.numeric(rownames(get(tmp3)))
+
+   nyears <- length(years)
+   nages <- length(ages.list)
+   mfcol <- c(ceiling(nyears),1)
+   par(mfcol=mfcol,oma=c(4.5,5.5,4.5,1),mar=c(0,0,0,0))
+   #cohort.color <- rainbow(nages+2) #use hideous rainbow colors because they loop more gracefully than rich.colors     
+   #ncolors <- length(cohort.color)
+   ylim <- c(0,1.05*max(obs.data,pred.data,pred2.data,pred3.data))
+   for (yr in 1:nyears) {
+     rowpred=years[yr]-1977+1
+     names.arg <- rep("",nages)
+ 
+
+ #if (yr>1) 
+ #     {   
+ #     diff <- years[yr] - years[yr-1] 
+ #     cohort.color <- c(cohort.color[(ncolors-diff+1):ncolors],cohort.color[-1*((ncolors-diff+1):ncolors)])
+ #     }  
+   x <- barplot(obs.data[yr,],space=0.2,ylim=ylim,las=1,names.arg=names.arg, cex.names=0.5, xaxs="i",
+                 yaxs="i",border=subtle.color,
+                 col=subtle.color,axes=F,ylab="",xlab="",main=main)
+
+      if (yr == nyears) {
+         axis(side=1,at=x,lab=ages.list, line=-0.1,col.axis=subtle.color, col=subtle.color,lwd=0,lwd.ticks=0)  #just use for the labels, to allow more control than names.arg
+      }
+      box(col=subtle.color,lwd=0.5)
+      #if (yr <= mfcol[1]) {
+      #  axis(2,las=1,at=c(0,0.25,0.5),col=subtle.color,col.axis=subtle.color,lwd=0.5)
+      #}
+      par(new=T)
+      par(xpd=NA)
+      plot(x=x,y=pred.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+          bg="white",fg="brown",
+          pch=19,cex=0.8,axes=F,ylab="",xlab="", col="red")
+      points(x=x,y=pred2.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+           bg="white",fg="brown",
+           pch=1,cex=0.8,axes=F,ylab="",xlab="", col="green")
+      points(x=x,y=pred3.data[rowpred,],ylim=ylim, xlim=par("usr")[1:2], las=1,xaxs="i",yaxs="i",
+             bg="white",fg="brown",
+             pch=2,cex=0.8,axes=F,ylab="",xlab="", col="blue")
+      
+      box(col=subtle.color,lwd=0.5)
+      x.pos <- par("usr")[1] + 0.85*diff(par("usr")[1:2])   #par("usr") spits out the current coordinates of the plot window
+      y.pos <- par("usr")[3] + 0.75*diff(par("usr")[3:4])   #par("usr") spits out the current coordinates of the plot window
+      text(x=x.pos,y=y.pos,years[yr],cex=1.2, col=subtle.color)
+      par(xpd=T)
+      if(yr==1)
+      {
+         x.pos <- par("usr")[1] + 0.10*diff(par("usr")[1:2])   #par("usr") spits out the current coordinates of the plot window
+         y.pos <- par("usr")[3] + 0.90*diff(par("usr")[3:4])   #par("usr") spits out the current coordinates of the plot window
+         legend(x.pos,y.pos,c(name1,name2,name3),pch=c(19,1,2), col=c("red","green","blue"),cex=1.4, bty="n")
+      }
+   }
+   mtext(side=1,outer=T,"Length (cm)",line=2.2, cex=1.4)
+   mtext(side=2,outer=T,"Proportion",line=3.2, cex=1.4, las=0)
+   mtext(side=3,outer=T,line=1.6,paste(""                ,"Fishery length composition data"), cex=1.4)
+   #mtext(side=3,outer=T,line=0.2,paste("(",case_label,")",sep=""),cex=1.0)
+   detach(dat)
+}
+
+
+
+
+
+

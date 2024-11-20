@@ -1,0 +1,26 @@
+{
+    "id": "2739298E",
+    "path": "~/stock_assess/rougheye/2024/Nov model/m_24_1_reweighted/retro/get_retro_results.R",
+    "project_path": "get_retro_results.R",
+    "type": "r_source",
+    "hash": "3953337585",
+    "contents": "",
+    "dirty": false,
+    "created": 1729281205257.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "4,76",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1729281521,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1729281521311,
+    "read_only": false,
+    "read_only_alternatives": []
+}

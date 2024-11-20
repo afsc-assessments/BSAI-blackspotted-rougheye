@@ -1,0 +1,24 @@
+{
+    "id": "AF517C82",
+    "path": "~/stock_assess/rougheye/2022/Nov model/graphs/af2.r",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "1845757284",
+    "contents": "",
+    "dirty": false,
+    "created": 1729373599301.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1602553626,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1602553626,
+    "read_only": false,
+    "read_only_alternatives": []
+}

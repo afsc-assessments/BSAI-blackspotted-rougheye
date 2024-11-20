@@ -1,0 +1,331 @@
+#	function to produce the stock assessment plots
+replots_mcmc <- function(x){
+#fishacu.o <- x$oac.f.unbiased
+#fishacu.p <- x$eac.f.unbiased
+surv3acu.o <- x$oac.AI_survey
+surv3acu.p <- x$eac.AI_survey
+fishlc.o <- x$olc.fish
+fishlc.p <- x$elc.fish
+#surv3lc.o <- x$olc.srv
+#surv3lc.p <- x$elc.srv
+#surv_ebs_ac.o <- x$oac.srv_ebs
+#surv_ebs_ac.p <- x$eac.srv_ebs
+
+#ps.options(setfont=ps.options()$fonts[3])
+#ps.options(font=3)
+#ps.options(reset=T)
+postscript(file="re2022_mcmc.ps", horizontal=F, family="Times")
+
+
+par(las=1)
+albubble(x$oac.f.unbiased,5)
+albubble(x$oac.AI_survey,15)
+#albubble(x$oac.srv_ebs,5)
+
+
+
+#
+#	now plot the fit to the ai survey biomass, and show the catch
+par(oma=c(10,5,5,5), mfrow=c(1,1), cex.axis=1.4, cex.lab=1.4, las=1)
+years <- length(as.numeric(unlist(x$AI_survey_obs_bio["obssrv.upper"])))
+
+maxy <- max(0.001*as.numeric(unlist(x$t.series["catchbio"])),
+  0.001*as.numeric(unlist(x$t.series["AI_survey_pred_bio"])),
+  0.001*as.numeric(unlist(x$AI_survey_obs_bio["obssrv.upper"])))
+
+plot(as.numeric(unlist(x$t.series["year"])),
+0.001*as.numeric(unlist(x$t.series["AI_survey_pred_bio"])), ylim=c(0,maxy), type ="l", lty=1,
+xlab="Year", ylab="Biomass(kt)", lwd=2)
+
+for (i in 1:years){
+  lines(c(as.numeric(row.names(x$AI_survey_obs_bio))[i],as.numeric(row.names(x$AI_survey_obs_bio))[i]),
+  c(0.001*as.numeric(unlist(x$AI_survey_obs_bio["obssrv.upper"]))[i],0.001*as.numeric(unlist(x$AI_survey_obs_bio["obssrv.lower"]))[i]),
+  lty=1, lwd=2)}
+
+points(as.numeric(row.names(x$AI_survey_obs_bio)),
+0.001*as.numeric(unlist(x$AI_survey_obs_bio["obssrv"])), type="p", pch=1, lwd=2)
+
+par(new=T)
+plot(as.numeric(row.names(x$t.series)),
+  0.001*as.numeric(unlist(x$t.series["catchbio"])),type="l",
+  lty=2,axes=F, ylab=" ", xlab=" ", lwd=2)
+axis(side=4)
+mtext(side=4, "Catch (kt)", outer=F, line=3.0, las=0, cex=1.4)
+par(xaxs="r") # release the direct axis
+
+#mtext("Figure 6.  Observed AI survey biomass(data points, +/- 2 standard deviations),",
+#side=1, outer=T, line=1, adj =0, cex=1.0)
+#mtext("predicted survey biomass(solid line), and AI harvest (dashed line).",
+#side=1, outer=T, line=2, adj =0, cex=1.0)
+#
+# #	now plot the fit to the ebs survey biomass
+#
+# maxy <- max(0.001*as.numeric(unlist(x$t.series["ebspredsrv"])),
+#   0.001*as.numeric(unlist(x$ebs_obssrv["obssrv.upper"])))
+#
+# plot(as.numeric(unlist(x$t.series["year"])),
+# 0.001*as.numeric(unlist(x$t.series["ebspredsrv"])), ylim=c(0,maxy), type ="l", lty=1,
+# xlab="Year", ylab="Biomass(kt)", lwd=2)
+#
+# for (i in 1:years){
+#   lines(c(as.numeric(row.names(x$ebs_obssrv))[i],as.numeric(row.names(x$ebs_obssrv))[i]),
+#   c(0.001*as.numeric(unlist(x$ebs_obssrv["obssrv.upper"]))[i],0.001*as.numeric(unlist(x$ebs_obssrv["obssrv.lower"]))[i]),
+#   lty=1, lwd=2)}
+#
+# points(as.numeric(row.names(x$ebs_obssrv)),
+# 0.001*as.numeric(unlist(x$ebs_obssrv["obssrv"])), type="p", pch=1, lwd=2)
+#
+#
+ par(oma=c(5,5,5,5), mar=c(2,5,5,5), mfrow=c(2,1))
+# #par(oma=c(10,5,5,5), mfrow=c(1,1), cex.axis=1.4, cex.lab=1.4)
+#
+#
+#
+ #  now plot the total and spawner biomass
+
+#
+ ymin <- 0.001*0.95*min(lwtb[1:46])
+# #ymin <- 0.001*0.95*min(as.numeric(unlist(x$t.series["totbiom"])))
+ ymax <- 0.001*1.05*max(uptb[1:46])
+# #ymax <- 0.001*1.05*max(as.numeric(unlist(x$t.series["totbiom"])))
+#
+ par(oma=c(5,5,1,5))
+ plot(as.numeric(row.names(x$t.series)),
+ 0.001*as.numeric(unlist(x$t.series["totbiom"])), xlab=" ",
+ ylab="Total Biomass (kt)", type="l", ylim=c(0,ymax), lwd=2)
+#
+#
+#
+ lines(as.numeric(row.names(x$t.series)),
+ 0.001*lwtb[1:46], lty=2)
+ lines(as.numeric(row.names(x$t.series)),
+ 0.001*uptb[1:46], lty=2)
+ #
+ par(mar=c(5,5,1,5))
+ ymin <- 0.001*0.95*min(lwsp)
+# #ymin <- 0.001*0.95*min(as.numeric(unlist(x$t.series["spbiom"])))
+ ymax <- 0.001*1.05*max(upsp)
+# #ymax <- 0.001*1.05*max(as.numeric(unlist(x$t.series["spbiom"])))
+
+ plot(as.numeric(row.names(x$t.series)),
+ 0.001*as.numeric(unlist(x$t.series["spbiom"])), xlab="Year",
+ ylab="Spawner Biomass (kt)", type="l", ylim=c(0,ymax), lwd=2)
+#
+ lines(as.numeric(row.names(x$t.series)),
+ 0.001*lwsp, lty=2)
+ lines(as.numeric(row.names(x$t.series)),
+ 0.001*upsp, lty=2)
+#
+# #mtext("Figure 7.  Total and spawner biomass for AI rougheye rockfish",
+# #side=1, outer=F, line=5.0, adj =0, cex=1.0)
+# #mtext("with 95% confidence intervals from MCMC integration.",
+# #side=1, outer=F, line=6.0, adj =0, cex=1.0)
+# # 
+ #	now plot the age compositions
+#
+ par(oma=c(5,5,5,5), mar=c(5,5,5,5))
+# #realplot(fishacu.o, fishacu.p,F,F,F,4,2)
+# #realplot(fishlc.o, fishlc.p,T,F,F,4,2)
+# #realplot(surv3acu.o, surv3acu.p,F,T,F,4,2)
+# #realplot(surv3lc.o, surv3lc.p,T,T,F,4,2)
+
+
+ AgeFits(x)
+ LenFits(x)
+ AgeFitsSrv(x)
+# LenFitsSrv(x)
+# AgeFitsSrv_EBS(x)
+# LenFitsSrv_ebs(x)
+
+
+ # plot the selectivity curves and the maturity ogive
+
+ #maturity <- scan("maturity.txt", sep=" ")
+
+ #  now plot the selectivity curves
+ par(oma=c(10,1,10,1), mar=c(5,5,5,5), mfrow=c(1,1))
+
+ if(as.numeric(x$fishselbins)==1)
+  {
+   plot(as.numeric(colnames(x$selfish)),
+   as.numeric(unlist(x$selfish[1,])), xlab=" ",
+   ylab="Selectivity", type="l", ylim=c(0,1), lwd=2)
+   lines(as.numeric(colnames(x$selfish)),
+   as.numeric(unlist(x$srv_sel$AI_survey_sel)), lty=2, lwd=2)
+   ##lines(as.numeric(colnames(x$selfish)),
+   ##as.numeric(unlist(x$ebs_srvsel)), lty=2, lwd=2, col="red")
+   }
+
+  else
+  {
+   plot(as.numeric(colnames(x$selfish)),
+   as.numeric(unlist(x$srvsel)), xlab=" ",
+   ylab="Selectivity", type="l", ylim=c(0,1), lwd=2)
+
+   # plot the fishery selectivy curve
+   par(cex=0.9)
+   persp(as.numeric(row.names(x$selfish)), as.numeric(colnames(x$selfish)),
+   x$selfish, xlab="Year", ylab="age", theta=60, phi=40,ticktype="detailed",
+   expand=0.5, zlab="")
+ }
+
+
+
+ ##lines(as.numeric(rownames(x$agesel)),
+ ##  maturity, lty=1, lwd=2, col="red")
+
+ mtext("Age", side=1, outer=F, line=2.0, cex=1.4)
+ #mtext("Figure 12.  Estimated fishery (solid line) and survey (dashed line) selectivity curve by age.",
+ #side=1, outer=F, line=3.0, adj =0, cex=0.9)
+
+ #  now plot the fully-selected fishing mortality rate
+ plot(as.numeric(row.names(x$t.series)),
+ as.numeric(unlist(x$t.series["fmort"])), xlab=" ",
+ ylab="F", type="l", ylim=c(0.0,max(as.numeric(unlist(x$t.series["fmort"])))*1.05), lwd=2)
+ mtext("Year", side=1, outer=F, line=2.0, cex=1.4)
+ #mtext("Figure 13.  Estimated fully selected fishing mortality for AI rougheye rockfish.", side=1, outer=F, line=3.0, adj =0, cex=0.9)
+
+
+ # plot the control rule and the fishing rate and ssb
+
+ endyr_rec <- as.numeric(x$controlrule["endyr_rec"])
+ endyr_rec_a10 <- as.numeric(x$controlrule["endyr_rec_a10"])
+ styr_rec <- as.numeric(x$controlrule["styr_rec"])
+ styr <- as.numeric(unlist(x$t.series["year"]))[1]
+ recruits <- as.numeric(unlist(x$t.series["a3recs"]))
+ years <- as.numeric(unlist(x$t.series["year"]))
+ avgrec <- mean(recruits[years >= styr & years <= endyr_rec])
+ #  add 2 to take out grant's effect for the mean age
+ avgrec_a10 <- mean(recruits[years >= styr & years <= endyr_rec_a10])
+
+ SBF40 <- as.numeric(x$controlrule["SBF40"])
+ SBF35 <- as.numeric(x$controlrule["SBF35"])
+ F40 <- as.numeric(x$controlrule["F40"])
+ F35 <- as.numeric(x$controlrule["F35"])
+ B40 <- avgrec*SBF40
+ B35 <- avgrec*SBF35
+ B40_a10 <- avgrec_a10*SBF40
+ B35_a10 <- avgrec_a10*SBF35
+
+ ymax <- max(1.0,max(as.numeric(unlist(x$t.series["fmort"]))/F35))*1.05
+ xmax <- max(1.1,max(as.numeric(unlist(x$t.series["spbiom"]))/B35_a10))*1.05
+
+ plot(as.numeric(unlist(x$t.series["spbiom"]))/B35_a10,
+ as.numeric(unlist(x$t.series["fmort"]))/F35, type = "p", pch=" ",
+ xlab="SSB/SSB35%", ylab="F/F35%", xlim=c(0,xmax),ylim=c(0,ymax))
+ # label year classes 77-88 red
+ text(as.numeric(unlist(x$t.series["spbiom"]))[1:45]/B35_a10,
+ as.numeric(unlist(x$t.series["fmort"]))[1:45]/F35,
+ as.numeric(unlist(x$t.series["year"]))[1:45],cex=0.8)
+ points(as.numeric(unlist(x$t.series["spbiom"]))[46]/B35_a10,
+ as.numeric(unlist(x$t.series["fmort"]))[46]/F35,
+ pch=23,cex=2.0, col="black", bg="black")
+
+
+# #text(as.numeric(unlist(x$t.series["spbiom"]))[38]/B35,
+# #as.numeric(unlist(x$t.series["fmort"]))[38]/F35,
+# #as.numeric(unlist(x$t.series["year"]))[38],cex=1.2, col="blue")
+#
+#
+#
+# #arrows(as.numeric(unlist(x$t.series["spbiom"]))[1:35]/B35_2,
+# #as.numeric(unlist(x$t.series["fmort"]))[1:33]/F35,
+# #as.numeric(unlist(x$t.series["spbiom"]))[2:36]/B35,
+# #as.numeric(unlist(x$t.series["fmort"]))[2:36]/F35, length=0, lty=1)
+#
+# # label depletion with alternative recruitment series red
+# #text(as.numeric(unlist(x$t.series["spbiom"]))[1:37]/B35_a10,
+# #as.numeric(unlist(x$t.series["fmort"]))[1:37]/F35,
+# #as.numeric(unlist(x$t.series["year"]))[1:37],cex=0.8, col="red")
+# ##text(as.numeric(unlist(x$t.series["spbiom"]))[38]/B35_a10,
+# ##as.numeric(unlist(x$t.series["fmort"]))[38]/F35,
+# ##as.numeric(unlist(x$t.series["year"]))[38],cex=1.2, col="blue")
+# #points(as.numeric(unlist(x$t.series["spbiom"]))[38]/B35_a10,
+# #as.numeric(unlist(x$t.series["fmort"]))[38]/F35,
+# #pch=23,cex=2.0, col="red", bg="red")
+#
+#
+#
+#
+# #arrows(as.numeric(unlist(x$t.series["spbiom"]))[1:35]/B35,
+# #as.numeric(unlist(x$t.series["fmort"]))[1:34]/F35,
+# #as.numeric(unlist(x$t.series["spbiom"]))[2:36]/B35,
+# #as.numeric(unlist(x$t.series["fmort"]))[2:36]/F35, length=0, lty=1)
+#
+#
+ xabc <- c(0.05,B40/B35,xmax)
+ yabc <- c(0.0,F40/F35,F40/F35)
+ xofl <- c(0.05,B40/B35,xmax)
+ yofl <- c(0.0,1,1)
+#
+ lines(xabc,yabc, lty=1)
+ lines(xofl,yofl, lty=1)
+
+#mtext("Figure 14.  Estimated fishing mortality and SSB in reference to ", side=1, outer=F, line=5.0, adj =0, cex=1.0)
+#mtext("OFL (upper line) and ABC (lower line) harvest control rules", side=1, outer=F, line=6.0, adj =0, cex=1.0)
+
+
+
+
+ #	Plot the recruitments
+
+ #nrec <- length(as.numeric(unlist(x$t.series["a3recs"]))) -3
+ years <- (as.numeric(unlist(x$t.series["year"]))[1:40])
+
+
+ ymax=max(uprec)
+ #ymax=max(as.numeric(unlist(x$t.series["a3recs"]))[4:41])
+#
+ xdata <- barplot(as.numeric(unlist(x$t.series["a3recs"])[4:43]),
+    type="l", col="black", names=years,
+    xlab=" ", ylab="Age 3 recruits (millions)", ylim=c(0,ymax))
+
+ segments(xdata,as.numeric(unlist(x$t.series["a3recs"])[4:43]),
+     xdata,uprec,lwd=2)
+#
+ mtext("Year Class", side = 1, outer=F, line=2, cex=1.4)
+# #mtext("Figure 15.  Estimated recruitment (age 3) of AI rougheye rockfish",
+# # side=1,outer=F, line=3, adj =0, cex=0.9)
+# #mtext("with 95% CI limits obtained from MCMC integration.",
+# # side=1,outer=F, line=4, adj =0, cex=0.9)
+# #
+# # plot the beginning and ending numbers at age
+# #par(oma=c(8,3,8,3), mfrow=c(2,1))
+# #plot(as.numeric(names(x$"Number in first year")),
+# #as.numeric(unlist(x$"Number in first year")), xlab=" ",
+# #ylab="Millions", type="l")
+# #mtext("beginning year numbers at age. Solid line = ADM", side =1,
+# #  outer = F, line =3, adj=0, cex=0.9)
+#
+#
+# #plot(as.numeric(names(x$"Number in year 2000")),
+# #as.numeric(unlist(x$"Number in year 2000")), xlab=" ",
+# #ylab="Millions", type="l")
+# #mtext("Year 2000 numbers at age. Solid line = ADM", side =1,
+# #  outer = F, line =3, adj=0, cex=0.9)
+#
+ # plot the sr data and curve and data
+ par(oma=c(8,3,8,3), mfrow=c(1,1))
+ xmax <- 1.05*max(as.numeric(unlist(x$t.series["spbiom"]))[1:40]*0.001)
+ ymax <- 1.05*max(as.numeric(unlist(x$t.series["a3recs"]))[4:43])
+ plot(as.numeric(unlist(x$t.series["spbiom"]))[1:40]*0.001,
+ as.numeric(unlist(x$t.series["a3recs"]))[4:43], type = "p", pch=" ",
+ xlab="SSB(kt)", ylab="Age 3 Recruits (millions)", xlim=c(0,xmax),ylim=c(0,ymax))
+ text(as.numeric(unlist(x$t.series["spbiom"]))[1:40]*0.001,
+ as.numeric(unlist(x$t.series["a3recs"]))[4:43],
+ as.numeric(unlist(x$t.series["year"]))[1:40],cex=1.0)
+
+ lines(as.numeric(unlist(x$reccurve["Srec.spawn"]))*0.001,
+ as.numeric(unlist(x$reccurve["Srec.rec"])), lty=1)
+
+ #mtext("Figure 16.  Scatterplot of AI rougheye rockfish spawner-recruit data; label is year class.",
+ #side=1, outer=T, line=1, adj =0, cex=0.9)
+
+
+
+
+
+
+dev.off()
+}
+
